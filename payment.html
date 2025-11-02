@@ -1,0 +1,24 @@
+<html>
+  <body>
+    <button id="payBtn">Pay Now</button>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      document.getElementById("payBtn").onclick = function () {
+        var options = {
+          key: "rzp_test_RStoebOPWxRM8m", // from test mode keys
+          amount: 50000, // in paise
+          currency: "INR",
+          name: "Test Payment",
+          description: "For testing purpose",
+          order_id: "order_RSuRC4XLXFo2vc", // from your dashboard
+          handler: function (response) {
+            alert(JSON.stringify(response, null, 2)); // shows payment_id, order_id, signature
+            console.log(response);
+          },
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+      };
+    </script>
+  </body>
+</html>
