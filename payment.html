@@ -6,11 +6,11 @@
       document.getElementById("payBtn").onclick = function () {
         var options = {
           key: "rzp_test_RStoebOPWxRM8m", // from test mode keys
-          amount: 50000, // in paise
+          amount: 500, // in paise
           currency: "INR",
           name: "Test Payment",
           description: "For testing purpose",
-          order_id: "order_RSuRC4XLXFo2vc", // from your dashboard
+          order_id: "order_RSuzpsprJEgOro", // from your dashboard
           handler: function (response) {
             alert(JSON.stringify(response, null, 2)); // shows payment_id, order_id, signature
             console.log(response);

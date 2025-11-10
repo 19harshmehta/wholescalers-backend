@@ -7,4 +7,8 @@ router.get('/sales', authenticate, authorize('wholesaler'), rc.sales);
 router.get('/inventory', authenticate, authorize('wholesaler'), rc.inventory);
 router.get('/customers', authenticate, authorize('wholesaler'), rc.customers);
 
+// ADDED: New route for exporting reports
+router.get('/export', authenticate, authorize('wholesaler'), rc.exportReport);
+
+
 module.exports = router;

@@ -9,7 +9,8 @@ const instance = new Razorpay({
     key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-exports.createRazorpayOrder = async (req, res) => {
+// Renamed function to align with common API convention and user request
+exports.createPaymentIntent = async (req, res) => {
     try {
         const { invoiceId } = req.body;
         const invoice = await Invoice.findById(invoiceId);
@@ -25,7 +26,7 @@ exports.createRazorpayOrder = async (req, res) => {
         }
 
         const options = {
-            amount: invoice.amount, // amount in the smallest currency unit (paise)
+            amount: invoice.amount * 100, // amount in the smallest currency unit (paise)
             currency: "INR",
             receipt: invoice.invoiceNumber,
         };
@@ -36,11 +37,20 @@ exports.createRazorpayOrder = async (req, res) => {
         invoice.razorpayOrderId = order.id;
         await invoice.save();
 
+        // The keyId, amount, and orderId are what the frontend needs.
+        // We add a URL structure as a conceptual 'paymentUrl' for your specific requirement.
+        const razorpayCheckoutUrl = `https://checkout.razorpay.com/v1/checkout.js?key=${process.env.RAZORPAY_KEY_ID}&order_id=${order.id}`;
+
+
         res.json({
-            orderId: order.id,
-            amount: order.amount,
-            currency: order.currency,
-            keyId: process.env.RAZORPAY_KEY_ID
+            // Your requested structure with explanatory values:
+            "paymentUrl": razorpayCheckoutUrl,
+            "orderId": order.id,
+
+            // Other necessary values for the frontend to open the modal
+            "keyId": process.env.RAZORPAY_KEY_ID,
+            "amount": order.amount,
+            "currency": order.currency
         });
 
     } catch (err) {

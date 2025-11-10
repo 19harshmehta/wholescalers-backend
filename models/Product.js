@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   stock: { type: Number, default: 0 },
   wholesaler: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  moq: { type: Number, default: 1 },
   createdAt: { type: Date, default: Date.now }
 });
 
