@@ -1,0 +1,28 @@
+config:
+  target: "http://localhost:4000"
+  processor: "./register-script.js"
+  phases:
+    - duration: 10
+      arrivalRate: 20
+    - duration: 10
+      arrivalRate: 50
+    - duration: 10
+      arrivalRate: 100
+    - duration: 10
+      arrivalRate: 200
+    - duration: 10
+      arrivalRate: 300
+
+scenarios:
+  - name: "Stress Test Register"
+    flow:
+      - function: createUserData
+      - post:
+          url: "/api/auth/register"
+          json:
+            name: "{{ name }}"
+            email: "{{ email }}"
+            password: "{{ password }}"
+            role: "{{ role }}"
+            company: "{{ company }}"
+            phone: "{{ phone }}"

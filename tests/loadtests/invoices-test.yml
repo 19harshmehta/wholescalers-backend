@@ -1,0 +1,44 @@
+config:
+  target: "http://localhost:4000"
+  processor: "./common-script.js"
+  phases:
+    - duration: 3
+      arrivalRate: 15
+    - duration: 5
+      arrivalRate: 40
+    - duration: 5
+      arrivalRate: 80
+    - duration: 5
+      arrivalRate: 150
+    - duration: 3
+      arrivalRate: 30
+
+scenarios:
+  - name: "Invoice Management Load Test"
+    flow:
+      - function: createUserData
+      - post:
+          url: "/api/auth/register"
+          json:
+            name: "{{ name }}"
+            email: "{{ email }}"
+            password: "{{ password }}"
+            role: "{{ role }}"
+            company: "{{ company }}"
+            phone: "{{ phone }}"
+          afterResponse: "saveToken"
+      - think: 1
+      - get:
+          url: "/api/invoices"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      - think: 1
+      - get:
+          url: "/api/invoices/507f1f77bcf86cd799439011"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      - think: 1
+      - get:
+          url: "/api/invoices/507f1f77bcf86cd799439011/pdf"
+          headers:
+            Authorization: "Bearer {{ token }}"

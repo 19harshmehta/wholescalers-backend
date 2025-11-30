@@ -1,0 +1,45 @@
+config:
+  target: "http://localhost:4000"
+  processor: "./common-script.js"
+  phases:
+    - duration: 3
+      arrivalRate: 20
+    - duration: 5
+      arrivalRate: 50
+    - duration: 5
+      arrivalRate: 100
+    - duration: 5
+      arrivalRate: 200
+    - duration: 3
+      arrivalRate: 50
+
+scenarios:
+  - name: "Payment Processing Load Test"
+    flow:
+      - function: createUserData
+      - post:
+          url: "/api/auth/register"
+          json:
+            name: "{{ name }}"
+            email: "{{ email }}"
+            password: "{{ password }}"
+            role: "{{ role }}"
+            company: "{{ company }}"
+            phone: "{{ phone }}"
+          afterResponse: "saveToken"
+      - think: 1
+      - post:
+          url: "/api/payments/create-payment-intent"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            orderId: "507f1f77bcf86cd799439011"
+            amount: 5000
+      - think: 2
+      - post:
+          url: "/api/payments/verify-payment"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            paymentId: "test_payment_{{ $randomNumber(1000, 9999) }}"
+            orderId: "507f1f77bcf86cd799439011"

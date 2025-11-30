@@ -1,0 +1,50 @@
+config:
+  target: "http://localhost:4000"
+  processor: "./common-script.js"
+  phases:
+    - duration: 3
+      arrivalRate: 15
+    - duration: 5
+      arrivalRate: 40
+    - duration: 5
+      arrivalRate: 80
+    - duration: 5
+      arrivalRate: 150
+    - duration: 3
+      arrivalRate: 30
+
+scenarios:
+  - name: "Order Creation Load Test"
+    flow:
+      - function: createUserData
+      - post:
+          url: "/api/auth/register"
+          json:
+            name: "{{ name }}"
+            email: "{{ email }}"
+            password: "{{ password }}"
+            role: "{{ role }}"
+            company: "{{ company }}"
+            phone: "{{ phone }}"
+          afterResponse: "saveToken"
+      - think: 1
+      - function: createOrderData
+      - post:
+          url: "/api/orders"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            productId: "507f1f77bcf86cd799439012"
+            quantity: "{{ quantity }}"
+            notes: "{{ notes }}"
+          afterResponse: "saveOrderId"
+      - think: 1
+      - get:
+          url: "/api/orders"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      - think: 1
+      - get:
+          url: "/api/orders/507f1f77bcf86cd799439011"
+          headers:
+            Authorization: "Bearer {{ token }}"

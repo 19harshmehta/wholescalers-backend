@@ -1,0 +1,49 @@
+config:
+  target: "http://localhost:4000"
+  processor: "./common-script.js"
+  phases:
+    - duration: 3
+      arrivalRate: 15
+    - duration: 5
+      arrivalRate: 40
+    - duration: 5
+      arrivalRate: 80
+    - duration: 5
+      arrivalRate: 150
+    - duration: 3
+      arrivalRate: 30
+
+scenarios:
+  - name: "Report Generation Load Test"
+    flow:
+      - function: createWholesalerData
+      - post:
+          url: "/api/auth/register"
+          json:
+            name: "{{ wholeName }}"
+            email: "{{ wholeEmail }}"
+            password: "{{ wholePassword }}"
+            role: "{{ wholeRole }}"
+            company: "{{ wholeCompany }}"
+            phone: "{{ wholePhone }}"
+          afterResponse: "saveToken"
+      - think: 1
+      - get:
+          url: "/api/reports/sales"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      - think: 1
+      - get:
+          url: "/api/reports/inventory"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      - think: 1
+      - get:
+          url: "/api/reports/customers"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      - think: 1
+      - get:
+          url: "/api/reports/export"
+          headers:
+            Authorization: "Bearer {{ token }}"

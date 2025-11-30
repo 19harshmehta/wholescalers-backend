@@ -1,0 +1,61 @@
+config:
+  target: "http://localhost:4000"
+  processor: "./common-script.js"
+  phases:
+    - duration: 3
+      arrivalRate: 15
+    - duration: 5
+      arrivalRate: 40
+    - duration: 5
+      arrivalRate: 80
+    - duration: 5
+      arrivalRate: 150
+    - duration: 3
+      arrivalRate: 30
+
+scenarios:
+  - name: "Product Management Load Test"
+    flow:
+      - function: createWholesalerData
+      - post:
+          url: "/api/auth/register"
+          json:
+            name: "{{ wholeName }}"
+            email: "{{ wholeEmail }}"
+            password: "{{ wholePassword }}"
+            role: "{{ wholeRole }}"
+            company: "{{ wholeCompany }}"
+            phone: "{{ wholePhone }}"
+          afterResponse: "saveToken"
+      - think: 1
+      - function: createProductData
+      - post:
+          url: "/api/products"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            name: "{{ productName }}"
+            description: "{{ productDesc }}"
+            category: "{{ productCategory }}"
+            price: "{{ productPrice }}"
+            stock: "{{ productStock }}"
+            minOrderQuantity: "{{ minOrder }}"
+          afterResponse: "saveProductId"
+      - think: 1
+      - get:
+          url: "/api/products"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      - think: 1
+      - get:
+          url: "/api/products/507f1f77bcf86cd799439012"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      - think: 1
+      - put:
+          url: "/api/products/507f1f77bcf86cd799439012"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            stock: 5000
+            price: 299.99
